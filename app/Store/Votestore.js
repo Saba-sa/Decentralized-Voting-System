@@ -13,7 +13,9 @@ const Votestore = ({ children }) => {
   const [isAllCandidatesAdded, setisAllCandidatesAdded] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [web3, setWeb3] = useState(null);
-  const [startTimer, setStartTimer] = useState(false);
+  const [startTimer, setStartTimer] = useState(false); // Initialize startTimer to false
+  const [targetTime, setTargetTime] = useState(null); // Add targetTime state
+  const [currentTime, setCurrentTime] = useState(null); // Add currentTime state
 
   const router = useRouter();
   useEffect(() => {
@@ -24,15 +26,11 @@ const Votestore = ({ children }) => {
           await window.ethereum.request({ method: "eth_requestAccounts" });
           setWeb3(web3Instance);
 
-          // const networkId = await web3Instance.eth.net.getId();
           const { abi, networks } = Handlevote;
-          // const deployedNetwork = networks[networkId];
           const networkData = networks["local"];
           const contractAddress = networkData?.address;
 
-          // if (deployedNetwork && deployedNetwork.address) {
           if (contractAddress) {
-            // const contractAddress = deployedNetwork.address;
             const contractInstance = new web3Instance.eth.Contract(
               abi,
               contractAddress
@@ -43,15 +41,12 @@ const Votestore = ({ children }) => {
               const ownerAddress = await contractInstance.methods
                 .owner()
                 .call();
-
               const accounts = await web3Instance.eth.getAccounts();
               const currentAccount = accounts[0];
 
-              if (currentAccount.toLowerCase() === ownerAddress.toLowerCase()) {
-                setIsOwner(true);
-              } else {
-                setIsOwner(false);
-              }
+              setIsOwner(
+                currentAccount.toLowerCase() === ownerAddress.toLowerCase()
+              );
             } catch (methodCallError) {
               console.error("Error calling 'owner' method:", methodCallError);
             }
@@ -85,13 +80,19 @@ const Votestore = ({ children }) => {
         setisAllCandidatesAdded,
         startTimer,
         setStartTimer,
+        targetTime,
+        setTargetTime,
+        currentTime,
+        setCurrentTime,
       }}
     >
       {children}
     </VotingIntegrationstore.Provider>
   );
 };
+
 const useVotingIntegrationstore = () => {
   return useContext(VotingIntegrationstore);
 };
+
 export { Votestore, useVotingIntegrationstore };

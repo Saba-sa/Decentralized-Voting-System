@@ -116,126 +116,129 @@ const Castvote = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100 p-12">
-      {/* {loader ? (
+      {loader ? (
         <Loader />
       ) : (
-        startTimer && ( */}
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-4xl">
-        <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
-          Vote Cast
-        </h1>
-        <form action="#" onSubmit={castVote}>
-          <div className="flex gap-4 items-center justify-between">
-            <div className="mb-4">
-              <label
-                htmlFor="cnic"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                CNIC (without dashes)
-              </label>
-              <input
-                type="text"
-                id="cnic"
-                className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Your CNIC"
-                required
-                value={cnicInput}
-                onChange={(e) => {
-                  setCnicInput(e.target.value);
-                  checkValidity();
-                }}
-              />
-            </div>
-            <span>+</span>
-            <div className="mb-4">
-              <label
-                htmlFor="randomno"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Random no (keep it secret)
-              </label>
-              <input
-                type="text"
-                id="randomno"
-                className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Random phrase or number"
-                required
-                value={randomnoInput}
-                onChange={(e) => {
-                  setRandomnoInput(e.target.value);
-                  checkValidity();
-                }}
-              />
-            </div>
-            <span>=</span>
-            <div className="mb-4">
-              <label
-                htmlFor="serialno"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Ballet Serial No
-              </label>
-              <input
-                type="text"
-                id="serialno"
-                className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Ballet paper serial no"
-                value={hash}
-                readOnly
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <div className="bg-blue-500ray-50">
-              <div className="block py-14 relative bg-opacity-50">
-                <div className="relative mx-auto h-full px-4 pb-20 md:pb-10 sm:max-w-xl md:max-w-full md:px-24 lg:max-w-screen-xl lg:px-8">
-                  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
-                    <div className="max-w-xl mx-auto text-center">
-                      <div className="inline-flex px-4 py-1.5 mx-auto rounded-full">
-                        <p className="text-4xl font-semibold tracking-widest text-g uppercase">
-                          Candidates Name
-                        </p>
-                      </div>
-                      <p className="mt-4 text-base leading-relaxed text-gray-600 group-hover:text-white">
-                        Your vote is your voice! Choose the candidate who truly
-                        represents your values and vision for a better future.
-                      </p>
-                    </div>
+        startTimer && (
+          <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-4xl">
+            <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
+              Vote Cast
+            </h1>
+            <form action="#" onSubmit={castVote}>
+              <div className="flex gap-4 items-center justify-between">
+                <div className="mb-4">
+                  <label
+                    htmlFor="cnic"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    CNIC (without dashes)
+                  </label>
+                  <input
+                    type="text"
+                    id="cnic"
+                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Your CNIC"
+                    required
+                    value={cnicInput}
+                    onChange={(e) => {
+                      setCnicInput(e.target.value);
+                      checkValidity();
+                    }}
+                  />
+                </div>
+                <span>+</span>
+                <div className="mb-4">
+                  <label
+                    htmlFor="randomno"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Random no (keep it secret)
+                  </label>
+                  <input
+                    type="text"
+                    id="randomno"
+                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Random phrase or number"
+                    required
+                    value={randomnoInput}
+                    onChange={(e) => {
+                      setRandomnoInput(e.target.value);
+                      checkValidity();
+                    }}
+                  />
+                </div>
+                <span>=</span>
+                <div className="mb-4">
+                  <label
+                    htmlFor="serialno"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Ballet Serial No
+                  </label>
+                  <input
+                    type="text"
+                    id="serialno"
+                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Ballet paper serial no"
+                    value={hash}
+                    readOnly
+                  />
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="bg-blue-500ray-50">
+                  <div className="block py-14 relative bg-opacity-50">
+                    <div className="relative mx-auto h-full px-4 pb-20 md:pb-10 sm:max-w-xl md:max-w-full md:px-24 lg:max-w-screen-xl lg:px-8">
+                      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
+                        <div className="max-w-xl mx-auto text-center">
+                          <div className="inline-flex px-4 py-1.5 mx-auto rounded-full">
+                            <p className="text-4xl font-semibold tracking-widest text-g uppercase">
+                              Candidates Name
+                            </p>
+                          </div>
+                          <p className="mt-4 text-base leading-relaxed text-gray-600 group-hover:text-white">
+                            Your vote is your voice! Choose the candidate who
+                            truly represents your values and vision for a better
+                            future.
+                          </p>
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-2 mt-6 lg:mt-6">
-                      {candidateDetail?.map((item) => (
-                        <Candidatelist
-                          key={item.id}
-                          id={item.id}
-                          setId={setId}
-                          name={item.name}
-                          selectedPerson={selectedPerson}
-                          handleCandidateSelection={handleCandidateSelection}
-                        />
-                      ))}
+                        <div className="grid grid-cols-1 gap-2 mt-6 lg:mt-6">
+                          {candidateDetail?.map((item) => (
+                            <Candidatelist
+                              key={item.id}
+                              id={item.id}
+                              setId={setId}
+                              name={item.name}
+                              selectedPerson={selectedPerson}
+                              handleCandidateSelection={
+                                handleCandidateSelection
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Cast Vote
-          </button>
-        </form>
-        {sucessMsg && (
-          <Successmodal message={sucessMsg} onClose={closeSuccessModal} />
-        )}
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Cast Vote
+              </button>
+            </form>
+            {sucessMsg && (
+              <Successmodal message={sucessMsg} onClose={closeSuccessModal} />
+            )}
 
-        {errormsg && (
-          <Errormodal message={errormsg} onClose={closeErrorModal} />
-        )}
-      </div>
-      {/* )
-      )} */}
+            {errormsg && (
+              <Errormodal message={errormsg} onClose={closeErrorModal} />
+            )}
+          </div>
+        )
+      )}
     </div>
   );
 };

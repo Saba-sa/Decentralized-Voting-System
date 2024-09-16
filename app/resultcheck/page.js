@@ -4,8 +4,9 @@ import Web3 from "web3";
 import { useVotingIntegrationstore } from "../Store/Votestore";
 import Errormodal from "../../components/Errormodal";
 import Timer from "@/components/Timer";
+
 const Resultcheck = () => {
-  const { contract, startTimer, setstartTimer } = useVotingIntegrationstore();
+  const { contract, startTimer } = useVotingIntegrationstore();
 
   const [CandidateDetail, setCandidateDetail] = useState([]);
   const [tempCandidate, settempCandidate] = useState([]);
@@ -14,6 +15,9 @@ const Resultcheck = () => {
   const [isContractReady, setIsContractReady] = useState(false);
   const [web3, setWeb3] = useState(null);
 
+  console.log("resulr chec timer", startTimer);
+
+  // Initialize web3 instance only once
   useEffect(() => {
     if (typeof window !== "undefined" && window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
@@ -22,6 +26,8 @@ const Resultcheck = () => {
       setError("MetaMask is not installed.");
     }
   }, []);
+
+  // Check if contract is ready once web3 is initialized
   useEffect(() => {
     if (contract && web3) {
       setIsContractReady(true);
@@ -33,7 +39,7 @@ const Resultcheck = () => {
 
   const showResult = async () => {
     try {
-      if (!web3) return;
+      if (!web3 || !contract) return; // Check if web3 and contract are initialized
       const accounts = await web3.eth.getAccounts();
       const candidateDetails = await contract.methods.getResult().call();
       setCandidateDetail([...candidateDetails]);
@@ -76,15 +82,18 @@ const Resultcheck = () => {
     }
   };
 
+  // Check for timer state change and show result when timer ends
   useEffect(() => {
     if (!startTimer) {
-      showResult();
+      console.log("Timer has ended, showing result.");
+      showResult(); // Call showResult only when timer ends
     }
   }, [startTimer]);
 
   const closeErrorModal = () => {
     setError("");
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
       <div className="bg-white dark:bg-gray-900  rounded-lg px-8 py-6 w-[90%] max-w-8xl">

@@ -5,8 +5,13 @@ import { useVotingIntegrationstore } from "../Store/Votestore";
 import Errormodal from "@/components/Errormodal";
 import Successmodal from "@/components/Successmodal";
 const Candidateaddition = () => {
-  const { contract, router, setisAllCandidatesAdded, setStartTimer } =
-    useVotingIntegrationstore();
+  const {
+    contract,
+    router,
+    setisAllCandidatesAdded,
+    isAllCandidatesAdded,
+    setStartTimer,
+  } = useVotingIntegrationstore();
 
   const [candidateName, setCandidateName] = useState("");
   const [isNotChecked, setIsNotChecked] = useState(false);
@@ -16,8 +21,7 @@ const Candidateaddition = () => {
   const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
   useEffect(() => {
     const checkCompletionStatus = () => {
-      const isCompleted = localStorage.getItem("candidateAdditionCompleted");
-      if (isCompleted === "true") {
+      if (isAllCandidatesAdded === true) {
         router.push("/castvote");
       }
     };
@@ -43,7 +47,6 @@ const Candidateaddition = () => {
         setSuccess("All candidates are added.");
         setisAllCandidatesAdded(true);
         setStartTimer(true);
-        localStorage.setItem("candidateAdditionCompleted", "true");
         router.push("/castvote");
       }
     } catch (error) {

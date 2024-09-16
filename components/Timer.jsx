@@ -1,62 +1,54 @@
-// "use client";
-// import React, { useEffect, useState } from "react";
-// import { useVotingIntegrationstore } from "../app/Store/Votestore";
+"use client";
+import React, { useEffect, useState } from "react";
+import { useVotingIntegrationstore } from "../app/Store/Votestore";
 
-// const Timer = () => {
-//   const { startTimer, setStartTimer, contract } = useVotingIntegrationstore();
-//   const [currentTime, setCurrentTime] = useState(null);
-//   const [targetTime, setTargetTime] = useState(null);
-//   const [timeLeft, setTimeLeft] = useState("");
+const Timer = () => {
+  const { startTimer, setStartTimer, contract, targetTime, setTargetTime, currentTime, setCurrentTime } = useVotingIntegrationstore();
+  const [timeLeft, setTimeLeft] = useState("");
 
-//   useEffect(() => {
-//     const fetchCurrentTime = async () => {
-//       if (startTimer) {
-//         const time = await contract.methods.getCurrentTime().call();
-//         const timestamp = Number(time) * 1000;
-//         const currentDate = new Date(timestamp);
-//         setCurrentTime(currentDate);
+  useEffect(() => {
+    const fetchCurrentTime = async () => {
+      if (startTimer && !targetTime) {
+        const time = await contract.methods.getCurrentTime().call();
+        const timestamp = Number(time) * 1000;
+        const currentDate = new Date(timestamp);
+        setCurrentTime(currentDate);
 
-//         const threeHoursLaterTimestamp = timestamp + 3 * 60 * 60 * 1000;
-//         setTargetTime(new Date(threeHoursLaterTimestamp));
-//       }
-//     };
+        const threeHoursLaterTimestamp = timestamp + 3 * 60 * 60 * 1000;
+        setTargetTime(new Date(threeHoursLaterTimestamp));
+      }
+    };
 
-//     fetchCurrentTime();
-//   }, [startTimer]);
+    fetchCurrentTime();
+  }, [startTimer, targetTime, contract]);
 
-//   useEffect(() => {
-//     const interval = setInterval(async () => {
-//       if (startTimer && targetTime) {
-//         const time = await contract.methods.getCurrentTime().call();
-//         const timestamp = Number(time) * 1000;
-//         const currentDate = new Date(timestamp);
-//         setCurrentTime(currentDate);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (targetTime && currentTime) {
+        const now = new Date();
+        const timeDifference = targetTime.getTime() - now.getTime();
+        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-//         const timeDifference = Math.max(
-//           0,
-//           Math.floor((targetTime - currentDate) / 1000)
-//         );
+        setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
 
-//         setTimeLeft(`${Math.floor(timeDifference / 60)}m ${timeDifference % 60}s`);
+        if (timeDifference <= 0) {
+          clearInterval(interval);
+          setStartTimer(false);
+        }
+      }
+    }, 1000);
 
-//         if (currentDate >= targetTime) {
-//           setStartTimer(false);
-//           clearInterval(interval);
-//         }
-//       }
-//     }, 1000);
+    return () => clearInterval(interval);
+  }, [targetTime, currentTime, setStartTimer]);
 
-//     return () => clearInterval(interval);
-//   }, [startTimer, targetTime, contract, setStartTimer]);
+  return (
+    <div className="flex flex-col items-center justify-center bg-gray-100 border border-gray-300 rounded-lg shadow-lg p-4 m-4">
+      <h2 className="text-xl font-semibold text-gray-700 mb-2">Time Left:</h2>
+      <div className="text-2xl font-bold text-blue-600">{timeLeft}</div>
+    </div>
+  );
+};
 
-//   return (
-//     startTimer && (
-//       <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100">
-//         <h1 className="text-2xl">Timer</h1>
-//         <p>Time Left: {timeLeft}</p>
-//       </div>
-//     )
-//   );
-// };
-
-// export default Timer;
+export default Timer;
