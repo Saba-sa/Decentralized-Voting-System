@@ -55,7 +55,9 @@ const Castvote = () => {
       router.push("/resultcheck");
     }
   }, [startTimer]);
+
   const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
+
   const castVote = async (event) => {
     event.preventDefault();
     setLoader(true);
@@ -115,18 +117,18 @@ const Castvote = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100 p-12">
+    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100 p-6 md:p-12">
       {loader ? (
         <Loader />
       ) : (
         startTimer && (
-          <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-4xl">
-            <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
-              Vote Cast
+          <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-6 py-6 max-w-full md:max-w-4xl w-full">
+            <h1 className="text-2xl font-bold text-center mb-6 dark:text-gray-200">
+              Cast Your Vote
             </h1>
-            <form action="#" onSubmit={castVote}>
-              <div className="flex gap-4 items-center justify-between">
-                <div className="mb-4">
+            <form onSubmit={castVote}>
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="w-full">
                   <label
                     htmlFor="cnic"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -146,8 +148,8 @@ const Castvote = () => {
                     }}
                   />
                 </div>
-                <span>+</span>
-                <div className="mb-4">
+
+                <div className="w-full">
                   <label
                     htmlFor="randomno"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -167,8 +169,8 @@ const Castvote = () => {
                     }}
                   />
                 </div>
-                <span>=</span>
-                <div className="mb-4">
+
+                <div className="w-full">
                   <label
                     htmlFor="serialno"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -185,54 +187,44 @@ const Castvote = () => {
                   />
                 </div>
               </div>
-              <div className="mb-4">
-                <div className="bg-blue-500ray-50">
-                  <div className="block py-14 relative bg-opacity-50">
-                    <div className="relative mx-auto h-full px-4 pb-20 md:pb-10 sm:max-w-xl md:max-w-full md:px-24 lg:max-w-screen-xl lg:px-8">
-                      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
-                        <div className="max-w-xl mx-auto text-center">
-                          <div className="inline-flex px-4 py-1.5 mx-auto rounded-full">
-                            <p className="text-4xl font-semibold tracking-widest text-g uppercase">
-                              Candidates Name
-                            </p>
-                          </div>
-                          <p className="mt-4 text-base leading-relaxed text-gray-600 group-hover:text-white">
-                            Your vote is your voice! Choose the candidate who
-                            truly represents your values and vision for a better
-                            future.
-                          </p>
-                        </div>
 
-                        <div className="grid grid-cols-1 gap-2 mt-6 lg:mt-6">
-                          {candidateDetail.length > 0 ? (
-                            candidateDetail?.map((item) => (
-                              <Candidatelist
-                                key={item.id}
-                                id={item.id}
-                                setId={setId}
-                                name={item.name}
-                                selectedPerson={selectedPerson}
-                                handleCandidateSelection={
-                                  handleCandidateSelection
-                                }
-                              />
-                            ))
-                          ) : (
-                            <p>loading....</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="my-6">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                    Candidates
+                  </h2>
+                  <p className="mt-2 text-base text-gray-600">
+                    Your vote is your voice! Choose the candidate who truly
+                    represents your values.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                  {candidateDetail.length > 0 ? (
+                    candidateDetail.map((item) => (
+                      <Candidatelist
+                        key={item.id}
+                        id={item.id}
+                        setId={setId}
+                        name={item.name}
+                        selectedPerson={selectedPerson}
+                        handleCandidateSelection={handleCandidateSelection}
+                      />
+                    ))
+                  ) : (
+                    <p>Loading candidates...</p>
+                  )}
                 </div>
               </div>
+
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Cast Vote
               </button>
             </form>
+
             {sucessMsg && (
               <Successmodal message={sucessMsg} onClose={closeSuccessModal} />
             )}
