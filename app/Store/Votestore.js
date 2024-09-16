@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useContext, createContext } from "react";
-import Handlevote from "../../out/VotingSystem.sol/HandleVote.json";
+import Handlevote from "../contract/HandleVote.json";
 import Web3 from "web3";
 import { useRouter } from "next/navigation";
 
