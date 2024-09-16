@@ -10,7 +10,7 @@ const Timer = () => {
     const fetchCurrentTime = async () => {
       if (startTimer && !targetTime) {
         const time = await contract.methods.getCurrentTime().call();
-        const timestamp = Number(time) * 1000;
+        const timestamp = Number(time) * 1000; 
         const currentDate = new Date(timestamp);
         setCurrentTime(currentDate);
 
@@ -20,27 +20,29 @@ const Timer = () => {
     };
 
     fetchCurrentTime();
-  }, [startTimer, targetTime, contract]);
+  }, [startTimer, targetTime, contract, setCurrentTime, setTargetTime]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (targetTime && currentTime) {
+    if (targetTime && currentTime) {
+      const interval = setInterval(() => {
         const now = new Date();
         const timeDifference = targetTime.getTime() - now.getTime();
-        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-        setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
 
         if (timeDifference <= 0) {
           clearInterval(interval);
-          setStartTimer(false);
-        }
-      }
-    }, 1000);
+          setTimeLeft("0h 0m 0s");
+          setStartTimer(false); 
+        } else {
+          const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+          const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-    return () => clearInterval(interval);
+          setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
   }, [targetTime, currentTime, setStartTimer]);
 
   return (

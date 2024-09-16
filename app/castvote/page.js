@@ -204,18 +204,22 @@ const Castvote = () => {
                         </div>
 
                         <div className="grid grid-cols-1 gap-2 mt-6 lg:mt-6">
-                          {candidateDetail?.map((item) => (
-                            <Candidatelist
-                              key={item.id}
-                              id={item.id}
-                              setId={setId}
-                              name={item.name}
-                              selectedPerson={selectedPerson}
-                              handleCandidateSelection={
-                                handleCandidateSelection
-                              }
-                            />
-                          ))}
+                          {candidateDetail.length > 0 ? (
+                            candidateDetail?.map((item) => (
+                              <Candidatelist
+                                key={item.id}
+                                id={item.id}
+                                setId={setId}
+                                name={item.name}
+                                selectedPerson={selectedPerson}
+                                handleCandidateSelection={
+                                  handleCandidateSelection
+                                }
+                              />
+                            ))
+                          ) : (
+                            <p>loading....</p>
+                          )}
                         </div>
                       </div>
                     </div>

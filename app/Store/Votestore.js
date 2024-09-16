@@ -13,9 +13,9 @@ const Votestore = ({ children }) => {
   const [isAllCandidatesAdded, setisAllCandidatesAdded] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [web3, setWeb3] = useState(null);
-  const [startTimer, setStartTimer] = useState(false); // Initialize startTimer to false
-  const [targetTime, setTargetTime] = useState(null); // Add targetTime state
-  const [currentTime, setCurrentTime] = useState(null); // Add currentTime state
+  const [startTimer, setStartTimer] = useState(false);
+  const [targetTime, setTargetTime] = useState(null);
+  const [currentTime, setCurrentTime] = useState(null);
 
   const router = useRouter();
   useEffect(() => {
@@ -28,6 +28,7 @@ const Votestore = ({ children }) => {
 
           const { abi, networks } = Handlevote;
           const networkData = networks["local"];
+          console.log("network data", networkData);
           const contractAddress = networkData?.address;
 
           if (contractAddress) {
@@ -42,6 +43,7 @@ const Votestore = ({ children }) => {
                 .owner()
                 .call();
               const accounts = await web3Instance.eth.getAccounts();
+              console.log("accounts", accounts);
               const currentAccount = accounts[0];
 
               setIsOwner(
@@ -68,7 +70,6 @@ const Votestore = ({ children }) => {
 
     InitializeContract();
   }, []);
-
   return (
     <VotingIntegrationstore.Provider
       value={{

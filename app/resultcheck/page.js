@@ -14,10 +14,8 @@ const Resultcheck = () => {
   const [errormsg, setError] = useState("");
   const [isContractReady, setIsContractReady] = useState(false);
   const [web3, setWeb3] = useState(null);
+  const [showResults, setShowResults] = useState(false);
 
-  console.log("resulr chec timer", startTimer);
-
-  // Initialize web3 instance only once
   useEffect(() => {
     if (typeof window !== "undefined" && window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
@@ -26,16 +24,6 @@ const Resultcheck = () => {
       setError("MetaMask is not installed.");
     }
   }, []);
-
-  // Check if contract is ready once web3 is initialized
-  useEffect(() => {
-    if (contract && web3) {
-      setIsContractReady(true);
-      showResult();
-    } else if (!contract) {
-      setError("Please refresh page");
-    }
-  }, [contract, web3]);
 
   const showResult = async () => {
     try {
@@ -82,13 +70,16 @@ const Resultcheck = () => {
     }
   };
 
-  // Check for timer state change and show result when timer ends
   useEffect(() => {
-    if (!startTimer) {
+    if (!startTimer && showResults) {
       console.log("Timer has ended, showing result.");
-      showResult(); // Call showResult only when timer ends
+      showResult();
     }
-  }, [startTimer]);
+  }, [startTimer, showResults]);
+
+  const onTimerEnd = () => {
+    setShowResults(true);
+  };
 
   const closeErrorModal = () => {
     setError("");
@@ -101,7 +92,7 @@ const Resultcheck = () => {
           Result
         </h1>
         {startTimer ? (
-          <Timer />
+          <Timer onTimerEnd={onTimerEnd} />
         ) : (
           <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-950">
             <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 mb-8 max-w-md w-full">
