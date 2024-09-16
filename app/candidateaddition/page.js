@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Web3 from "web3";
+// import Web3 from "web3";
 import { useVotingIntegrationstore } from "../Store/Votestore";
 import Errormodal from "@/components/Errormodal";
 import Successmodal from "@/components/Successmodal";
@@ -19,7 +19,7 @@ const Candidateaddition = () => {
   const [errormsg, setError] = useState("");
   const [sucessMsg, setSuccess] = useState("");
 
-  const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
+  // const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
 
   useEffect(() => {
     const checkCompletionStatus = () => {
@@ -34,7 +34,7 @@ const Candidateaddition = () => {
   const handleAddCandidate = async (event) => {
     event.preventDefault();
     try {
-      const accounts = await web3.eth.getAccounts();
+      // const accounts = await web3.eth.getAccounts();
       if (!candidateName) {
         setError("Candidate name is required");
         return;

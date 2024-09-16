@@ -43,7 +43,7 @@ const Votestore = ({ children }) => {
                 .owner()
                 .call();
               const accounts = await web3Instance.eth.getAccounts();
-              console.log("accounts", accounts);
+              console.log("accounts", web3, accounts);
               const currentAccount = accounts[0];
 
               setIsOwner(

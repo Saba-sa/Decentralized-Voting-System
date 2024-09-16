@@ -12,7 +12,7 @@ const Resultcheck = () => {
   const [tempCandidate, settempCandidate] = useState([]);
   const [winner, setWinner] = useState([]);
   const [errormsg, setError] = useState("");
-  const [isContractReady, setIsContractReady] = useState(false);
+  // const [isContractReady, setIsContractReady] = useState(false);
   const [web3, setWeb3] = useState(null);
   const [showResults, setShowResults] = useState(false);
 
@@ -27,8 +27,9 @@ const Resultcheck = () => {
 
   const showResult = async () => {
     try {
+      console.log("temp", tempCandidate);
       if (!web3 || !contract) return; // Check if web3 and contract are initialized
-      const accounts = await web3.eth.getAccounts();
+      // const accounts = await web3.eth.getAccounts();
       const candidateDetails = await contract.methods.getResult().call();
       setCandidateDetail([...candidateDetails]);
 

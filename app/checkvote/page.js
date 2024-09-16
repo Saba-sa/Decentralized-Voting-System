@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import CryptoJS from "crypto-js";
-import Web3 from "web3";
+// import Web3 from "web3";
 import Errormodal from "@/components/Errormodal";
 
 import { useVotingIntegrationstore } from "../Store/Votestore";
@@ -31,7 +31,7 @@ const Castvote = () => {
   useEffect(() => {
     checkValidity();
   }, [cnicInput, randomnoInput]);
-  const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
+  // const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
   const getDetails = async (event) => {
     event.preventDefault();
     try {
