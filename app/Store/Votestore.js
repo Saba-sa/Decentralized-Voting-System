@@ -27,8 +27,7 @@ const Votestore = ({ children }) => {
           setWeb3(web3Instance);
 
           const { abi, networks } = Handlevote;
-          const networkData = networks["local"];
-          console.log("network data", networkData);
+          const networkData = networks[11155111];
           const contractAddress = networkData?.address;
 
           if (contractAddress) {

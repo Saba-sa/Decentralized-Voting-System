@@ -23,6 +23,7 @@ const Candidateaddition = () => {
 
   useEffect(() => {
     const checkCompletionStatus = () => {
+      console.log("all acaa", isAllCandidatesAdded);
       if (isAllCandidatesAdded === true) {
         router.push("/castvote");
       }
