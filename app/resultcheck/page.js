@@ -1,149 +1,159 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Web3 from "web3";
-import { useVotingIntegrationstore } from "../Store/Votestore";
-import Errormodal from "../../components/Errormodal";
-import Timer from "@/components/Timer";
+import React, { useState, useEffect } from "react";
+import { useVotingIntegrationstore } from "../../store/Dvotingstore";
+import Loader from "../loader/Page";
 
-const Resultcheck = () => {
-  const { contract, startTimer } = useVotingIntegrationstore();
-
-  const [CandidateDetail, setCandidateDetail] = useState([]);
-  const [tempCandidate, settempCandidate] = useState([]);
-  const [winner, setWinner] = useState([]);
-  const [errormsg, setError] = useState("");
-  // const [isContractReady, setIsContractReady] = useState(false);
-  const [web3, setWeb3] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+const Page = () => {
+  const [candidateDetails, setCandidateDetail] = useState([]);
+  const [votes, setVotes] = useState({});
+  const [winner, setWinner] = useState(null);
+  const [timer, setTimer] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const { contract } = useVotingIntegrationstore();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
-    } else {
-      setError("MetaMask is not installed.");
-    }
-  }, []);
+    const fetchVotingData = async () => {
+      if (!contract) return;
+      try {
+        const allCandidatesAdded = await contract.methods
+          .allCandidatesadded()
+          .call();
+        if (allCandidatesAdded) {
+          const targetTime = Number(
+            await contract.methods.getThreeHoursFromNow().call()
+          );
+          const currentTime = Math.floor(Date.now() / 1000);
+
+          if (currentTime >= targetTime) {
+            setIsTimerActive(false);
+            showResult();
+            setLoader(false);
+          } else {
+            setIsTimerActive(true);
+            const initialTimeInSeconds = targetTime - currentTime;
+            const initialTimeInMillis = initialTimeInSeconds * 1000;
+            setTimer(initialTimeInMillis);
+            setLoader(false);
+
+            const interval = setInterval(async () => {
+              try {
+                const updatedTime = Math.floor(Date.now() / 1000);
+                const remainingTime = (targetTime - updatedTime) * 1000;
+                if (remainingTime <= 0) {
+                  clearInterval(interval);
+                  setIsTimerActive(false);
+                  showResult();
+                } else {
+                  setTimer(remainingTime);
+                }
+              } catch (error) {
+                console.error("Error fetching current time:", error);
+              }
+            }, 1000);
+
+            return () => clearInterval(interval);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching voting data:", error);
+      }
+    };
+    fetchVotingData();
+  }, [contract]);
+  const formatTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   const showResult = async () => {
+    if (!web3 || !contract) return;
     try {
-      console.log("temp", tempCandidate);
-      if (!web3 || !contract) return; // Check if web3 and contract are initialized
-      // const accounts = await web3.eth.getAccounts();
-      const candidateDetails = await contract.methods.getResult().call();
-      setCandidateDetail([...candidateDetails]);
+      const candidateResults = await contract.methods.getResult().call();
+      setCandidateDetail(candidateResults);
 
-      const tempCandidates = candidateDetails.map((i) => i.candidateName);
-      settempCandidate([...tempCandidates]);
+      const sortedCandidates = candidateResults
+        .map((candidate) => ({
+          name: candidate.candidateName,
+          votesCount: candidate.votes,
+        }))
+        .sort((a, b) => b.votesCount - a.votesCount);
 
-      const tempcandidateNames = [];
-
-      candidateDetails.forEach((candidate) => {
-        const existingCandidate = tempcandidateNames.find(
-          (item) => item.name === candidate.candidateName
-        );
-
-        if (existingCandidate) {
-          existingCandidate.votesCount++;
-        } else {
-          tempcandidateNames.push({
-            name: candidate.candidateName,
-            votesCount: 1,
-          });
-        }
-      });
-
-      tempcandidateNames.sort((a, b) => b.votesCount - a.votesCount);
-
-      const maxVotes = tempcandidateNames[0]?.votesCount;
-
-      const allEqual = tempcandidateNames.every(
+      const maxVotes = sortedCandidates[0]?.votesCount;
+      const allEqual = sortedCandidates.every(
         (candidate) => candidate.votesCount === maxVotes
       );
 
-      if (allEqual) {
-        setWinner([{ name: "all have same votes", votesCount: maxVotes }]);
-      } else {
-        setWinner([...tempcandidateNames]);
-      }
+      setWinner(
+        allEqual
+          ? [{ name: "All candidates tried", votesCount: maxVotes }]
+          : sortedCandidates
+      );
     } catch (error) {
-      setError(`Error getting result: ${error.message}`);
+      console.error(`Error showing results: ${error.message}`);
     }
-  };
-
-  useEffect(() => {
-    if (!startTimer && showResults) {
-      console.log("Timer has ended, showing result.");
-      showResult();
-    }
-  }, [startTimer, showResults]);
-
-  const onTimerEnd = () => {
-    setShowResults(true);
-  };
-
-  const closeErrorModal = () => {
-    setError("");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
-      <div className="bg-white dark:bg-gray-900  rounded-lg px-8 py-6 w-[90%] max-w-8xl">
-        <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
-          Result
-        </h1>
-        {startTimer ? (
-          <Timer onTimerEnd={onTimerEnd} />
-        ) : (
-          <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-950">
-            <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 mb-8 max-w-md w-full">
-              <h1 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">
-                Winner
-              </h1>
-              <p className="text-lg font-medium text-gray-800 dark:text-gray-300">
-                Name: {winner[0]?.name}
-              </p>
-              <p className="text-lg font-medium text-gray-800 dark:text-gray-300">
-                Votes: {winner[0]?.votesCount}
-              </p>
+    <div className="container mx-auto p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg rounded-lg my-12 overflow-hidden">
+      {loader ? (
+        <Loader />
+      ) : (
+        <>
+          <h1 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+            Voting Results
+          </h1>
+          {isTimerActive ? (
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-green-400">Timer</h2>
+              <p className="text-lg font-medium">{formatTime(timer)}</p>
             </div>
-
-            <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-2lg w-full">
-              <h2 className="text-xl font-semibold mb-4 dark:text-gray-200">
-                Votes Details
-              </h2>
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Hash
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Votes
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                  {CandidateDetail.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                        {item.serialNo}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                        {item.candidateName}
-                      </td>
+          ) : (
+            <>
+              {winner && (
+                <div className="bg-green-100 text-green-700 p-4 rounded-lg shadow-md">
+                  <h2 className="text-xl font-semibold">Winner</h2>
+                  <p className="text-lg">{winner[0]?.name}</p>
+                </div>
+              )}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-blue-400">Results</h2>
+                <table className="min-w-full divide-y divide-gray-700">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Candidate
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        Hash
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {errormsg && <Errormodal message={errormsg} onClose={closeErrorModal} />}
+                  </thead>
+                  <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    {candidateDetails.map((candidate) => (
+                      <tr key={candidate.serialNo}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                          {candidate.candidateName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {candidate.serialNo}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };
 
-export default Resultcheck;
+export default Page;

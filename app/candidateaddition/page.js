@@ -1,130 +1,95 @@
 "use client";
-import React, { useEffect, useState } from "react";
-// import Web3 from "web3";
-import { useVotingIntegrationstore } from "../Store/Votestore";
-import Errormodal from "@/components/Errormodal";
-import Successmodal from "@/components/Successmodal";
+import { useEffect, useState } from "react";
+import { useVotingIntegrationstore } from "@/store/Dvotingstore";
+import { useRouter } from "next/navigation";
 
-const Candidateaddition = () => {
-  const {
-    contract,
-    router,
-    setisAllCandidatesAdded,
-    isAllCandidatesAdded,
-    setStartTimer,
-  } = useVotingIntegrationstore();
-
+export default function page() {
   const [candidateName, setCandidateName] = useState("");
-  const [isNotChecked, setIsNotChecked] = useState(false);
-  const [errormsg, setError] = useState("");
-  const [sucessMsg, setSuccess] = useState("");
-
-  // const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
+  const [allAdded, setAllAdded] = useState(false);
+  const { isOwner, contract, isAllCandidatesAdded, setisAllCandidatesAdded } =
+    useVotingIntegrationstore();
+  const router = useRouter();
 
   useEffect(() => {
-    const checkCompletionStatus = () => {
-      console.log("all acaa", isAllCandidatesAdded);
-      if (isAllCandidatesAdded === true) {
-        router.push("/castvote");
-      }
-    };
-
-    checkCompletionStatus();
-  }, [router, isAllCandidatesAdded]);
+    if (isAllCandidatesAdded) {
+      router.push("/castvote");
+    } else if (!isOwner) {
+      router.push("/castvote");
+    }
+  }, [isAllCandidatesAdded, isOwner, router]);
 
   const handleAddCandidate = async (event) => {
     event.preventDefault();
-    try {
-      // const accounts = await web3.eth.getAccounts();
-      if (!candidateName) {
-        setError("Candidate name is required");
-        return;
-      }
-
+    if (contract) {
       await contract.methods
-        .addCandidate(candidateName)
+        .addCandidate(candidateName.trim())
         .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
-      setSuccess("Candidate added successfully");
+
       setCandidateName("");
-      if (isNotChecked) {
-        setSuccess("All candidates are added.");
-        setisAllCandidatesAdded(true);
-        setStartTimer(true);
+
+      if (allAdded) {
+        await contract.methods
+          .setAllCandidatesAdded()
+          .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
+
+        const allcandidates = await contract.methods
+          .allCandidatesadded()
+          .call();
+        console.log(
+          "candidate in candidate addition all setted",
+          allcandidates
+        );
+
+        setisAllCandidatesAdded(allcandidates);
         router.push("/castvote");
       }
-    } catch (error) {
-      setError("Error adding candidate:", error);
     }
   };
 
-  const closeSuccessModal = () => {
-    setSuccess("");
-  };
-
-  const closeErrorModal = () => {
-    setError("");
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100">
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-6 py-8 max-w-lg w-full sm:max-w-2xl md:max-w-4xl mx-4 sm:mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 dark:text-gray-200">
-          Add candidate
-        </h1>
-        <form onSubmit={handleAddCandidate}>
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={candidateName}
-              onChange={(e) => setCandidateName(e.target.value)}
-              className="shadow-sm rounded-md w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Candidate Name"
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                className="h-4 w-4 sm:h-5 sm:w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:outline-none mr-2"
-                onClick={() => setIsNotChecked(true)}
-              />
-              <label
-                htmlFor="remember"
-                className="block text-sm sm:text-base text-gray-700 dark:text-gray-300"
-              >
-                Yes, I have added all candidates
-              </label>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-2 px-4 sm:py-3 sm:px-5 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    <div className="container mx-auto p-6 bg-gray-800 text-white shadow-lg rounded-lg my-8">
+      <h1 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-800">
+        Add Candidates
+      </h1>
+      <form onSubmit={handleAddCandidate} className="space-y-6">
+        <div>
+          <label
+            htmlFor="candidate-name"
+            className="block text-lg font-medium mb-2 text-green-600"
           >
-            Add
-          </button>
-        </form>
+            Candidate Name
+          </label>
+          <input
+            id="candidate-name"
+            type="text"
+            value={candidateName}
+            onChange={(e) => setCandidateName(e.target.value)}
+            className="border border-gray-600 p-2 w-full rounded-lg text-gray-900"
+            placeholder="Enter candidate name"
+            required
+          />
+        </div>
 
-        {sucessMsg && (
-          <Successmodal message={sucessMsg} onClose={closeSuccessModal} />
-        )}
+        <div className="flex items-center">
+          <input
+            id="all-added"
+            type="checkbox"
+            checked={allAdded}
+            onChange={(e) => setAllAdded(e.target.checked)}
+            className="mr-2 accent-green-800"
+          />
+          <label htmlFor="all-added" className="text-lg text-blue-600">
+            All candidates added
+          </label>
+        </div>
 
-        {errormsg && (
-          <Errormodal message={errormsg} onClose={closeErrorModal} />
-        )}
-      </div>
+        <button
+          type="submit"
+          className="bg-green-400 hover:bg-green-600 text-gray-900 font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out"
+        >
+          Add Candidate
+        </button>
+      </form>
     </div>
   );
-};
-
-export default Candidateaddition;
+}

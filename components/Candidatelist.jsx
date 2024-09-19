@@ -1,32 +1,29 @@
-import React from 'react'
+import React from "react";
 
-const Candidatelist = ({ id, setId, name, selectedPerson, handleCandidateSelection }) => {
-  console.log('id',id)
+const Candidatelist = ({ candidate,setId, selectedCandidate,setSelectedCandidate, handleCandidateSelection }) => {
+  
+
   return (
-    <>
-      <label htmlFor={name}
-        className="transition-all duration-1000 bg-white hover:bg-blue-500 hover:shadow-xl m-2 p-2 relative  group cursor-pointer  flex items-center justify-start "
-      >
-        <input type="radio" id={name} name="candidate"
-          value={name}
-          checked={selectedPerson === name}
-          onChange={handleCandidateSelection}
-          onClick={() => setId(id)}
+    <div className="space-y-4  cursor-pointer" onClick={()=>{setId(candidate.id); setSelectedCandidate(candidate.name)}}>
+          <div  className="flex items-center p-4 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 shadow-sm" 
+>
+            <input
+              type="radio"
+              id={candidate.id}
+              name="candidate"
+              value={candidate.name}
+              checked={selectedCandidate === candidate.name}
+              onChange={handleCandidateSelection} 
+              className="mr-3 accent-green-500"
 
-          className="form-checkbox h-5 w-5 text-blue-600" />
-        <div className="absolute bg-blue-500/50 top-0 left-0 w-32 h-1  transition-all duration-200 group-hover:bg-white group-hover:w-1/2"></div>
-        <div className="py-2 px-9 relative">
+            />
+            <label htmlFor={`${candidate.id}`} className="text-lg font-medium text-gray-800 dark:text-gray-200">
+              {candidate.name}
+            </label>
+          </div>
+   
+    </div>
+  );
+};
 
-          <h2 className="mt-3 text-xl font-semibold text-gray-800 group-hover:text-white">
-            {name}
-          </h2>
-
-        </div>
-      </label>
-
-    </>
-
-  )
-}
-
-export default Candidatelist
+export default Candidatelist;

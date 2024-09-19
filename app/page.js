@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { useVotingIntegrationstore } from "./Store/Votestore";
+import { useVotingIntegrationstore } from "../store/Dvotingstore";
 import { useRouter } from "next/navigation";
 import Loader from "./loader/Page";
 
@@ -9,17 +9,16 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("owner", isOwner);
     const InitializeContract = async () => {
-      if (!isLoading) {
-        if (isOwner) {
-          router.push("/candidateaddition");
-        } else {
-          router.push("/castvote");
-        }
+      if (isOwner) {
+        router.push("/candidateaddition");
+      } else {
+        router.push("/castvote");
       }
     };
     InitializeContract();
-  }, [isOwner, isLoading, router]);
+  }, [isOwner]);
 
   return <>{isLoading && <Loader />}</>;
 };

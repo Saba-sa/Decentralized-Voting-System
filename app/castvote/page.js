@@ -1,96 +1,97 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import CryptoJS from "crypto-js";
-import Candidatelist from "@/components/Candidatelist";
-import Web3 from "web3";
-import Errormodal from "@/components/Errormodal";
-import Successmodal from "@/components/Successmodal";
-import { useVotingIntegrationstore } from "../Store/Votestore";
+import Candidatelist from "../../components/Candidatelist";
+import { useVotingIntegrationstore } from "../../store/Dvotingstore";
 import Loader from "../loader/Page";
-
+import Successmodal from "../../components/Modalforsucess";
+import Errormodal from "../../components/Modalforeorr";
 const Castvote = () => {
-  const [cnicInput, setCnicInput] = useState("");
-  const [randomnoInput, setRandomnoInput] = useState("");
+  const [cnic, setCnic] = useState("");
+  const [randomno, setrandomno] = useState("");
   const [hash, setHash] = useState("");
   const [candidateDetail, setCandidateDetail] = useState([]);
-  const [selectedPerson, setSelectedPerson] = useState("");
+  const [selectedCandidate, setSelectedCandidate] = useState("");
   const [idofcan, setId] = useState(0);
-  const [errormsg, setError] = useState("");
-  const [sucessMsg, setSuccess] = useState("");
   const [loader, setLoader] = useState(false);
-  const { contract, router, startTimer } = useVotingIntegrationstore();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorModalMessage, setErrorModalMessage] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const { contract } = useVotingIntegrationstore();
 
   const calculateHash = () => {
-    const input = cnicInput + randomnoInput;
-    const hashResult = CryptoJS.SHA256(input).toString(CryptoJS.enc.Hex);
-    setHash(hashResult);
+    if (cnic && randomno) {
+      const input = cnic + randomno;
+      const hashResult = CryptoJS.SHA256(input).toString(CryptoJS.enc.Hex);
+      setHash(hashResult);
+    }
   };
 
   const checkValidity = () => {
     const regestForCnic = /^\d{13}$/;
-    if (regestForCnic.test(cnicInput) && randomnoInput.length >= 1) {
+    if (regestForCnic.test(cnic) && randomno.length >= 1) {
       calculateHash();
+      setErrorMessage("");
+    } else {
+      setHash("");
+      if (!regestForCnic.test(cnic)) {
+        setErrorMessage("Invalid CNIC. CNIC must be 13 digits.");
+      } else {
+        setErrorMessage("Random number is required.");
+      }
     }
   };
 
   const handleCandidateSelection = (e) => {
-    setSelectedPerson(e.target.value);
+    setSelectedCandidate(e.target.value);
+    setId(e.target.id);
   };
-
-  useEffect(() => {
-    checkValidity();
-  }, [cnicInput, randomnoInput]);
-
-  useEffect(() => {
-    const getdetail = async () => {
-      if (contract) {
-        getCandidateDetail();
-      }
-    };
-    getdetail();
-  }, [contract]);
-
-  useEffect(() => {
-    if (!startTimer) {
-      router.push("/resultcheck");
-    }
-  }, [startTimer]);
-
-  const web3 = typeof window !== "undefined" ? new Web3(window.ethereum) : null;
 
   const castVote = async (event) => {
     event.preventDefault();
     setLoader(true);
     try {
-      const accounts = await web3.eth.getAccounts();
-      if (idofcan.length < 0) {
+      if (!selectedCandidate) {
+        setErrorModalMessage("Please select a candidate.");
+        setShowErrorModal(true);
         setLoader(false);
-        setError("Any candidate must be selected");
         return;
       }
 
-      if (!cnicInput || !randomnoInput) {
+      if (!cnic || !randomno) {
+        setErrorModalMessage("Please complete all fields.");
+        setShowErrorModal(true);
+
         setLoader(false);
-        setError("Please calculate serial number");
         return;
       }
 
-      const selectedAccount = accounts[0];
+      if (!hash) {
+        setErrorModalMessage(
+          "Hash not generated. Check CNIC and random number."
+        );
+        setShowErrorModal(true);
+
+        setLoader(false);
+        return;
+      }
+
       const temp = "0x".concat(hash);
       await contract.methods
-        .balletPaper(temp, cnicInput, idofcan)
-        .send({ from: selectedAccount, gas: 3000000 });
+        .balletPaper(temp, cnic, idofcan)
+        .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
 
       setLoader(false);
-      setSuccess("Vote cast successfully");
-      setTimeout(() => {
-        router.push("/checkvote");
-      }, 2000);
+      setSuccessMsg("Vote cast successfully!");
+      setShowSuccessModal(true);
     } catch (error) {
       setLoader(false);
-      setError(
-        `Error while casting vote. Please fill the fields carefully: ${error.message}`
+      setErrorModalMessage(
+        `Error casting vote: ${error.message.split(":")[0]}`
       );
+      setShowErrorModal(true);
     }
   };
 
@@ -104,136 +105,123 @@ const Castvote = () => {
       }
       setCandidateDetail(candidatesList);
     } catch (error) {
-      setError(`Error fetching candidate details: ${error.message}`);
+      setErrorModalMessage(
+        `Error fetching candidate details: ${error.message}`
+      );
+      setShowErrorModal(true);
     }
   };
 
-  const closeSuccessModal = () => {
-    setSuccess("");
-  };
+  useEffect(() => {
+    checkValidity();
+  }, [cnic, randomno]);
 
-  const closeErrorModal = () => {
-    setError("");
-  };
+  useEffect(() => {
+    if (contract) {
+      getCandidateDetail();
+    }
+  }, [contract]);
+
+  const closeSuccessModal = () => setShowSuccessModal(false);
+  const closeErrorModal = () => setShowErrorModal(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950 bg-gray-100 p-6 md:p-12">
+    <div className="container mx-auto p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg rounded-lg my-12 overflow-hidden ">
       {loader ? (
         <Loader />
       ) : (
-        startTimer && (
-          <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-6 py-6 max-w-full md:max-w-4xl w-full">
-            <h1 className="text-2xl font-bold text-center mb-6 dark:text-gray-200">
-              Cast Your Vote
-            </h1>
-            <form onSubmit={castVote}>
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                <div className="w-full">
-                  <label
-                    htmlFor="cnic"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    CNIC (without dashes)
-                  </label>
-                  <input
-                    type="text"
-                    id="cnic"
-                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Your CNIC"
-                    required
-                    value={cnicInput}
-                    onChange={(e) => {
-                      setCnicInput(e.target.value);
-                      checkValidity();
-                    }}
-                  />
-                </div>
-
-                <div className="w-full">
-                  <label
-                    htmlFor="randomno"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Random no (keep it secret)
-                  </label>
-                  <input
-                    type="text"
-                    id="randomno"
-                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Random phrase or number"
-                    required
-                    value={randomnoInput}
-                    onChange={(e) => {
-                      setRandomnoInput(e.target.value);
-                      checkValidity();
-                    }}
-                  />
-                </div>
-
-                <div className="w-full">
-                  <label
-                    htmlFor="serialno"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Ballet Serial No
-                  </label>
-                  <input
-                    type="text"
-                    id="serialno"
-                    className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Ballet paper serial no"
-                    value={hash}
-                    readOnly
-                  />
-                </div>
-              </div>
-
-              <div className="my-6">
-                <div className="text-center">
-                  <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-                    Candidates
-                  </h2>
-                  <p className="mt-2 text-base text-gray-600">
-                    Your vote is your voice! Choose the candidate who truly
-                    represents your values.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                  {candidateDetail.length > 0 ? (
-                    candidateDetail.map((item) => (
-                      <Candidatelist
-                        key={item.id}
-                        id={item.id}
-                        setId={setId}
-                        name={item.name}
-                        selectedPerson={selectedPerson}
-                        handleCandidateSelection={handleCandidateSelection}
-                      />
-                    ))
-                  ) : (
-                    <p>Loading candidates...</p>
-                  )}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        <>
+          <h1 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+            Cast Your Vote
+          </h1>
+          <form onSubmit={castVote} className="space-y-6">
+            <div>
+              <label
+                htmlFor="cnic"
+                className="block text-lg font-medium mb-2 text-green-400"
               >
-                Cast Vote
-              </button>
-            </form>
+                CNIC
+              </label>
+              <input
+                id="cnic"
+                type="text"
+                value={cnic}
+                onChange={(e) => setCnic(e.target.value)}
+                className="border border-gray-600 p-2 w-full rounded-lg text-gray-900"
+                placeholder="Enter CNIC"
+                required
+              />
+            </div>
 
-            {sucessMsg && (
-              <Successmodal message={sucessMsg} onClose={closeSuccessModal} />
+            <div>
+              <label
+                htmlFor="random-number"
+                className="block text-lg font-medium mb-2 text-green-400"
+              >
+                Random Number
+              </label>
+              <input
+                id="random-number"
+                type="text"
+                value={randomno}
+                onChange={(e) => setrandomno(e.target.value)}
+                className="border border-gray-600 p-2 w-full rounded-lg text-gray-900"
+                placeholder="Enter random number"
+                required
+              />
+            </div>
+
+            {errorMessage && (
+              <div className="text-red-500">
+                <p>{errorMessage}</p>
+              </div>
             )}
 
-            {errormsg && (
-              <Errormodal message={errormsg} onClose={closeErrorModal} />
+            {hash && (
+              <div>
+                <label className="block text-lg font-medium mb-2 text-blue-400">
+                  Hash
+                </label>
+                <p className="border border-gray-600 p-2 rounded-lg bg-gray-800 text-gray-300">
+                  {hash}
+                </p>
+              </div>
             )}
-          </div>
-        )
+
+            <div className="space-y-2">
+              <label className="block text-lg font-medium mb-2 text-blue-400">
+                Select Candidate
+              </label>
+              {candidateDetail?.length > 0 ? (
+                candidateDetail.map((candidate) => (
+                  <Candidatelist
+                    key={candidate.id}
+                    candidate={candidate}
+                    setSelectedCandidate={setSelectedCandidate}
+                    setId={setId}
+                    selectedCandidate={selectedCandidate}
+                    handleCandidateSelection={handleCandidateSelection}
+                  />
+                ))
+              ) : (
+                <p>Loading candidates...</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="bg-green-400 hover:bg-green-500 text-gray-900 font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out"
+            >
+              Cast Vote
+            </button>
+          </form>
+          {showSuccessModal && (
+            <Successmodal msg={successMsg} onClose={closeSuccessModal} />
+          )}
+          {showErrorModal && (
+            <Errormodal msg={errorModalMessage} onClose={closeErrorModal} />
+          )}
+        </>
       )}
     </div>
   );
