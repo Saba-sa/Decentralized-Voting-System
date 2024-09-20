@@ -5,7 +5,6 @@ import Loader from "../loader/Page";
 
 const Page = () => {
   const [candidateDetails, setCandidateDetail] = useState([]);
-  const [votes, setVotes] = useState({});
   const [winner, setWinner] = useState(null);
   const [timer, setTimer] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);

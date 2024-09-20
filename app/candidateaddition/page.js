@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useVotingIntegrationstore } from "@/store/Dvotingstore";
 import { useRouter } from "next/navigation";
 import Loader from "../loader/Page";
-export default function page() {
+export default function Page() {
   const [candidateName, setCandidateName] = useState("");
   const [allAdded, setAllAdded] = useState(false);
   const [loadershow, setloadershow] = useState(true);
@@ -98,7 +98,7 @@ export default function page() {
                 id="all-added"
                 type="checkbox"
                 checked={allAdded}
-                onChange={(e) => setAllAdded(!allAdded)}
+                onChange={() => setAllAdded(!allAdded)}
                 className="mr-2 accent-green-800"
               />
               <label htmlFor="all-added" className="text-lg text-blue-600">
