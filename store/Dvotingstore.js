@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, createContext, useContext } from "react";
 import Web3 from "web3";
-import HandleVote from "../out/VotingSystem.sol/HandleVote.json";
+import HandleVote from "../app/contract/HandleVote.json";
 
 const VotingIntegrationstore = createContext();
 
