@@ -19,7 +19,7 @@ const Castvote = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const { contract } = useVotingIntegrationstore();
+  const { contract, contractWallet } = useVotingIntegrationstore();
 
   const calculateHash = () => {
     if (cnic && randomno) {
@@ -79,13 +79,16 @@ const Castvote = () => {
       }
 
       const temp = "0x".concat(hash);
-      await contract.methods
+      await contractWallet.methods
         .balletPaper(temp, cnic, idofcan)
         .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
 
-      setLoader(false);
       setSuccessMsg("Vote cast successfully!");
       setShowSuccessModal(true);
+      setLoader(false);
+      setCnic("");
+      setrandomno("");
+      setHash("");
     } catch (error) {
       setLoader(false);
       setErrorModalMessage(

@@ -23,7 +23,7 @@ contract HandleVoteTest is Test {
         vm.stopPrank();
     }
 
-    function testAddCandidate() public {
+    function testAddCandidate() public view {
         (string memory name, uint256 votesCount) = getCandidate(0);
         assertEq(name, "Alice");
         assertEq(votesCount, 0);
@@ -61,7 +61,9 @@ contract HandleVoteTest is Test {
 
         handleVote.balletPaper(serialNo, cnic, candidateIndex);
 
-        HandleVote.CandidateDetail memory voteRecord = handleVote.getVoteRecord(serialNo);
+        HandleVote.CandidateDetail memory voteRecord = handleVote.getVoteRecord(
+            serialNo
+        );
         assertEq(voteRecord.name, "Alice");
 
         vm.stopPrank();
@@ -93,12 +95,18 @@ contract HandleVoteTest is Test {
         assertEq(results[1].candidateName, "Bob");
     }
 
-    function getCandidate(uint256 _index) internal view returns (string memory, uint256) {
-        HandleVote.CandidateDetail memory candidate = handleVote.getCandidate(_index);
+    function getCandidate(
+        uint256 _index
+    ) internal view returns (string memory, uint256) {
+        HandleVote.CandidateDetail memory candidate = handleVote.getCandidate(
+            _index
+        );
         return (candidate.name, candidate.votesCount);
     }
 
-    function getVoteRecord(bytes32 _serialNo) internal view returns (HandleVote.CandidateDetail memory) {
+    function getVoteRecord(
+        bytes32 _serialNo
+    ) internal view returns (HandleVote.CandidateDetail memory) {
         return handleVote.getVoteRecord(_serialNo);
     }
 }

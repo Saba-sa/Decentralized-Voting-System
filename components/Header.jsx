@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation"; 
 import Link from "next/link";
 import Web3 from "web3";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useVotingIntegrationstore } from "../store/Dvotingstore"; 
 
 export default function Header() {
@@ -10,8 +10,35 @@ export default function Header() {
   const {connectedWallet, setconnectedWallet } = useVotingIntegrationstore();
 
  const [walletConnected, setWalletConnected] = useState(
-    connectedWallet.length > 0 ? `${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : "Connect Wallet"
+    connectedWallet ? `${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}` : "Connect Wallet"
   );
+
+  
+
+ useEffect(() => {
+    const handleAccountsChanged = async (accounts) => {
+      if (accounts.length > 0) {
+        setconnectedWallet(accounts[0]);
+      } else {
+        setconnectedWallet("");
+      }
+    };
+
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+    return () => {
+      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+    };
+  }, [setconnectedWallet]);
+
+
+   useEffect(() => {
+    if (connectedWallet) {
+      setWalletConnected(`${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}`);
+    } else {
+      setWalletConnected("Connect Wallet");
+    }
+  }, [connectedWallet]);
 
   const connectWallet = async () => {
     if (typeof window !== undefined && window.ethereum) {
@@ -70,7 +97,7 @@ export default function Header() {
           className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-5 rounded-full shadow-lg hover:shadow-yellow-400 transition duration-300 ease-in-out" 
           onClick={connectWallet}
         >
-          {walletConnected.length > 1 ? walletConnected : "Connect Wallet"}
+          {walletConnected ? walletConnected : "Connect Wallet"}
         </button>
       </div>
     </header>

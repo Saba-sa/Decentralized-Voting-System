@@ -9,7 +9,6 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("owner", isOwner);
     const InitializeContract = async () => {
       if (isOwner) {
         router.push("/candidateaddition");
