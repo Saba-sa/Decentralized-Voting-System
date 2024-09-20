@@ -55,16 +55,9 @@ contract HandleVote {
         candidateCount++;
     }
 
-    function balletPaper(
-        bytes32 _serialno,
-        uint256 _cnic,
-        uint256 _i
-    ) public hasVoted {
+    function balletPaper(bytes32 _serialno, uint256 _cnic, uint256 _i) public hasVoted {
         require(!votesCount[_serialno], "Serial number already used");
-        require(
-            bytes(candidates[_i].name).length > 0,
-            "Invalid candidate index"
-        );
+        require(bytes(candidates[_i].name).length > 0, "Invalid candidate index");
         require(!cnicVotes[_cnic], "CNIC is already present, sorry.");
         alreadyVoted[msg.sender] = true;
 
@@ -75,16 +68,12 @@ contract HandleVote {
         serialNumbers.push(_serialno);
     }
 
-    function getCandidate(
-        uint256 _index
-    ) public view returns (CandidateDetail memory) {
+    function getCandidate(uint256 _index) public view returns (CandidateDetail memory) {
         require(_index < candidateCount, "Candidate does not exist");
         return candidates[_index];
     }
 
-    function getVoteRecord(
-        bytes32 _serialno
-    ) public view returns (CandidateDetail memory) {
+    function getVoteRecord(bytes32 _serialno) public view returns (CandidateDetail memory) {
         require(votesCount[_serialno], "Serial number has not voted");
         return voteRecords[_serialno];
     }
