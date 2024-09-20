@@ -45,18 +45,18 @@ export default function page() {
 
       setCandidateName("");
 
+      console.log("checked", allAdded);
       if (allAdded) {
         await contractWallet.methods
           .setAllCandidatesAdded()
           .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
-
+        await contractWallet.methods
+          .setVotingEndTime()
+          .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
         const allcandidates = await contract.methods
           .allCandidatesadded()
           .call();
-        console.log(
-          "candidate in candidate addition all setted",
-          allcandidates
-        );
+        console.log("contract in candidate addition all setted", allcandidates);
 
         setisAllCandidatesAdded(allcandidates);
         router.push("/castvote");
@@ -98,7 +98,7 @@ export default function page() {
                 id="all-added"
                 type="checkbox"
                 checked={allAdded}
-                onChange={(e) => setAllAdded(e.target.checked)}
+                onChange={(e) => setAllAdded(!allAdded)}
                 className="mr-2 accent-green-800"
               />
               <label htmlFor="all-added" className="text-lg text-blue-600">

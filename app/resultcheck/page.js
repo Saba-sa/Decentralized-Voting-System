@@ -14,15 +14,25 @@ const Page = () => {
 
   useEffect(() => {
     const fetchVotingData = async () => {
+      console.log("inside fetching voting detail function");
       if (!contract) return;
       try {
         const allCandidatesAdded = await contract.methods
           .allCandidatesadded()
           .call();
+        console.log("voting detail allCandidatesAdded", allCandidatesAdded);
         if (allCandidatesAdded) {
           const targetTime = Number(
-            await contract.methods.getThreeHoursFromNow().call()
+            await contract.methods.getVotingEndTime().call()
           );
+
+          console.log(
+            "target time",
+            await contract.methods.getVotingEndTime().call()
+          );
+          console.log("hello", await contract.methods.votingEndTime().call());
+
+          console.log("target time", targetTime);
           const currentTime = Math.floor(Date.now() / 1000);
 
           if (currentTime >= targetTime) {

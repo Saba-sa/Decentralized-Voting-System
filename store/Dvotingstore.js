@@ -56,6 +56,7 @@ const Votestore = ({ children }) => {
           setcontractWallet(contractInstance2);
           setContract(contractInstance);
 
+          console.log("before");
           const ownerAddress = await contractInstance.methods.owner().call();
           console.log("owner address", ownerAddress);
           const accounts = await web3Instance.eth.getAccounts();

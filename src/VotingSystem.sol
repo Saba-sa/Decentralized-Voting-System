@@ -22,6 +22,7 @@ contract HandleVote {
     address public owner;
     uint8 public candidateCount;
     bool public allCandidatesadded = false;
+    uint256 public votingEndTime;
 
     constructor() {
         owner = msg.sender;
@@ -41,8 +42,12 @@ contract HandleVote {
         allCandidatesadded = true;
     }
 
-    function getThreeHoursFromNow() public view returns (uint256) {
-        return block.timestamp + (3 * 60 * 60);
+    function setVotingEndTime() public onlyOwner {
+        votingEndTime = block.timestamp + (3 * 60 * 60);
+    }
+
+    function getVotingEndTime() public view returns (uint256) {
+        return votingEndTime;
     }
 
     function addCandidate(string memory _name) public onlyOwner {
