@@ -9,34 +9,27 @@ const Page = () => {
   const [timer, setTimer] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [loader, setLoader] = useState(true);
-  const { contract } = useVotingIntegrationstore();
+  const [tempCandidate, settempCandidate] = useState([]);
+  const { contract, setTimeup } = useVotingIntegrationstore();
 
   useEffect(() => {
     const fetchVotingData = async () => {
-      console.log("inside fetching voting detail function");
       if (!contract) return;
       try {
         const allCandidatesAdded = await contract.methods
           .allCandidatesadded()
           .call();
-        console.log("voting detail allCandidatesAdded", allCandidatesAdded);
         if (allCandidatesAdded) {
           const targetTime = Number(
             await contract.methods.getVotingEndTime().call()
           );
 
-          console.log(
-            "target time",
-            await contract.methods.getVotingEndTime().call()
-          );
-          console.log("hello", await contract.methods.votingEndTime().call());
-
-          console.log("target time", targetTime);
           const currentTime = Math.floor(Date.now() / 1000);
 
           if (currentTime >= targetTime) {
             setIsTimerActive(false);
             showResult();
+            setTimeup(true);
             setLoader(false);
           } else {
             setIsTimerActive(true);
@@ -52,6 +45,7 @@ const Page = () => {
                 if (remainingTime <= 0) {
                   clearInterval(interval);
                   setIsTimerActive(false);
+                  setTimeup(true);
                   showResult();
                 } else {
                   setTimer(remainingTime);
@@ -84,25 +78,41 @@ const Page = () => {
     if (!web3 || !contract) return;
     try {
       const candidateResults = await contract.methods.getResult().call();
-      setCandidateDetail(candidateResults);
+      setCandidateDetail([...candidateResults]);
 
-      const sortedCandidates = candidateResults
-        .map((candidate) => ({
-          name: candidate.candidateName,
-          votesCount: candidate.votes,
-        }))
-        .sort((a, b) => b.votesCount - a.votesCount);
+      const tempCandidates = candidateResults.map((i) => i.candidateName);
+      settempCandidate([...tempCandidates]);
 
-      const maxVotes = sortedCandidates[0]?.votesCount;
-      const allEqual = sortedCandidates.every(
+      const tempcandidateNames = [];
+
+      candidateResults.forEach((candidate) => {
+        const existingCandidate = tempcandidateNames.find(
+          (item) => item.name === candidate.candidateName
+        );
+
+        if (existingCandidate) {
+          existingCandidate.votesCount++;
+        } else {
+          tempcandidateNames.push({
+            name: candidate.candidateName,
+            votesCount: 1,
+          });
+        }
+      });
+
+      tempcandidateNames.sort((a, b) => b.votesCount - a.votesCount);
+
+      const maxVotes = tempcandidateNames[0]?.votesCount;
+
+      const allEqual = tempcandidateNames.every(
         (candidate) => candidate.votesCount === maxVotes
       );
 
-      setWinner(
-        allEqual
-          ? [{ name: "All candidates tried", votesCount: maxVotes }]
-          : sortedCandidates
-      );
+      if (allEqual) {
+        setWinner([{ name: "All have same votes", votesCount: maxVotes }]);
+      } else {
+        setWinner([...tempcandidateNames]);
+      }
     } catch (error) {
       console.error(`Error showing results: ${error.message}`);
     }

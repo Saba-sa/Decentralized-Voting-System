@@ -8,8 +8,10 @@ const VotingIntegrationstore = createContext();
 const Votestore = ({ children }) => {
   const [contract, setContract] = useState(null);
   const [contractWallet, setcontractWallet] = useState(null);
+  const [timeup, setTimeup] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [connectedWallet, setconnectedWallet] = useState("");
+  const [isAllCandidatesAdded, setisAllCandidatesAdded] = useState(false);
 
   useEffect(() => {
     const reconnectWallet = async () => {
@@ -35,30 +37,32 @@ const Votestore = ({ children }) => {
   const getContractDetails = async () => {
     if (connectedWallet) {
       try {
-        const web3Instance = new Web3(window.ethereum);
+        // const web3Wallet = new Web3(window.ethereum);
         const web3InstanceALchemy = new Web3(
           "https://eth-sepolia.g.alchemy.com/v2/CB6IJpmJWTUzOlLA-w5CTTVg6AYdE-dJ"
         );
-        // const web3Wallet = new Web3(window.ethereum);
+        // const web3InstanceALchemy = new Web3("http://127.0.0.1:8545");
+        const web3Instance = new Web3(window.ethereum);
         const { abi, networks } = HandleVote;
         // const networkData = networks["local"];
         const networkData = networks["11155111"];
         const contractAddress = networkData?.address;
         if (contractAddress) {
-          const contractInstance = new web3InstanceALchemy.eth.Contract(
+          const contractInstance = new web3Instance.eth.Contract(
             abi,
             contractAddress
           );
-          const contractInstance2 = new web3Instance.eth.Contract(
+          const contractInstance2 = new web3InstanceALchemy.eth.Contract(
             abi,
             contractAddress
           );
+
           setcontractWallet(contractInstance2);
           setContract(contractInstance);
 
-          console.log("before");
-          const ownerAddress = await contractInstance.methods.owner().call();
-          console.log("owner address", ownerAddress);
+          console.log("contractas", contractAddress);
+          const ownerAddress = await contractInstance2.methods.owner().call();
+          console.log("ownerAddress", ownerAddress);
           const accounts = await web3Instance.eth.getAccounts();
           const currentAccount = accounts[0];
 
@@ -79,10 +83,14 @@ const Votestore = ({ children }) => {
         setContract,
         isOwner,
         setIsOwner,
+        timeup,
+        setTimeup,
         connectedWallet,
         setconnectedWallet,
         contractWallet,
         setcontractWallet,
+        isAllCandidatesAdded,
+        setisAllCandidatesAdded,
       }}
     >
       {children}

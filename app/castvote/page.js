@@ -6,6 +6,8 @@ import { useVotingIntegrationstore } from "../../store/Dvotingstore";
 import Loader from "../loader/Page";
 import Successmodal from "../../components/Modalforsucess";
 import Errormodal from "../../components/Modalforeorr";
+import { useRouter } from "next/navigation";
+
 const Castvote = () => {
   const [cnic, setCnic] = useState("");
   const [randomno, setrandomno] = useState("");
@@ -13,13 +15,14 @@ const Castvote = () => {
   const [candidateDetail, setCandidateDetail] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [idofcan, setId] = useState(0);
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorModalMessage, setErrorModalMessage] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const { contract, contractWallet } = useVotingIntegrationstore();
+  const { contract, contractWallet, timeup } = useVotingIntegrationstore();
+  const router = useRouter();
 
   const calculateHash = () => {
     if (cnic && randomno) {
@@ -28,7 +31,11 @@ const Castvote = () => {
       setHash(hashResult);
     }
   };
-
+  useEffect(() => {
+    if (timeup) {
+      router.push("/resultcheck");
+    }
+  }, [timeup]);
   const checkValidity = () => {
     const regestForCnic = /^\d{13}$/;
     if (regestForCnic.test(cnic) && randomno.length >= 1) {
@@ -107,6 +114,7 @@ const Castvote = () => {
         candidatesList.push({ id: i, name: detail.name });
       }
       setCandidateDetail(candidatesList);
+      setLoader(false);
     } catch (error) {
       setErrorModalMessage(
         `Error fetching candidate details: ${error.message}`

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useVotingIntegrationstore } from "@/store/Dvotingstore";
 import { useRouter } from "next/navigation";
 import Loader from "../loader/Page";
@@ -15,25 +15,29 @@ export default function Page() {
     setisAllCandidatesAdded,
   } = useVotingIntegrationstore();
   const router = useRouter();
-  console.log("is all candidate added", isAllCandidatesAdded);
 
   useEffect(() => {
-    if (isAllCandidatesAdded) {
-      setloadershow(false);
-    } else if (!isOwner) {
-      router.push("/castvote");
-    }
+    const checkIfaddes = async () => {
+      if (contract) {
+        const allcandidates = await contract.methods
+          .allCandidatesadded()
+          .call();
+        console.log("all canidate added", allcandidates);
+        if (allcandidates || !isOwner) {
+          router.push("/castvote");
+          setloadershow(false);
+        } else {
+          setloadershow(false);
+        }
+      }
+    };
+    checkIfaddes();
   }, [isAllCandidatesAdded, isOwner, router]);
-
-  useEffect(() => {
-    if (isOwner) {
-      setloadershow(false);
-    }
-  }, [isOwner, contractWallet, contract]);
 
   const handleAddCandidate = async (event) => {
     event.preventDefault();
     if (contract) {
+      setloadershow(true);
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const accounts = await window.ethereum.request({
         method: "eth_accounts",
@@ -59,8 +63,10 @@ export default function Page() {
         console.log("contract in candidate addition all setted", allcandidates);
 
         setisAllCandidatesAdded(allcandidates);
+        setloadershow(false);
         router.push("/castvote");
       }
+      setloadershow(false);
     }
   };
 

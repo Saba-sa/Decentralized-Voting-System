@@ -40,27 +40,29 @@ export default function Header() {
     }
   }, [connectedWallet]);
 
-  const connectWallet = async () => {
-    if (typeof window !== undefined && window.ethereum) {
-      try {
-        const web3 = new Web3(window.ethereum);
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const walletAddress = accounts[0];
-        
-        setconnectedWallet(walletAddress);
 
-        const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
-        setWalletConnected(truncatedAddress);
+const connectWallet = async () => {
+  if (typeof window !== 'undefined' && window.ethereum) {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const walletAddress = accounts[0];
 
-        return web3;
-      } catch (error) {
-        console.error("Error connecting to MetaMask:", error);
-      }
-    } else {
-      console.error("MetaMask not found. Please install MetaMask.");
+      setconnectedWallet(walletAddress);
+      const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+      setWalletConnected(truncatedAddress);
+      
+      return web3;
+    } catch (error) {
+      console.error("Error connecting to MetaMask:", error);
+      alert("Failed to connect. Please try again.");
     }
+  } else {
+    alert("MetaMask not found. Please install MetaMask.");
+  }
+
   };
 
   return (

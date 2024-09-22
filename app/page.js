@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Loader from "./loader/Page";
 
 const Page = () => {
-  const { isOwner, isLoading } = useVotingIntegrationstore();
+  const { isOwner, contract } = useVotingIntegrationstore();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const Page = () => {
     InitializeContract();
   }, [isOwner]);
 
-  return <>{isLoading && <Loader />}</>;
+  return <>{contract && <Loader />}</>;
 };
 
 export default Page;
