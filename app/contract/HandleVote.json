@@ -295,8 +295,8 @@
     "linkReferences": {}
   },
   "networks": {
-    "local": {
-      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    "11155111": {
+      "address": "0x2ce7f4bA4B95dd76e94855fBfb6BdC4dA992e5E9"
     }
   },
   "deployedBytecode": {

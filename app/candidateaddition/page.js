@@ -44,20 +44,21 @@ console.log('is owner',isOwner,contract,contractWallet,isAllCandidatesAdded)
         method: "eth_accounts",
       });
       const selectedAddress = accounts[0];
-      await contractWallet.methods
+      console.log('account',selectedAddress)
+      await contract.methods
         .addCandidate(candidateName.trim())
-        .send({ from: selectedAddress, gas: 3000000 });
+        .send({ from: selectedAddress });
 
       setCandidateName("");
 
       console.log("checked", allAdded);
       if (allAdded) {
-        await contractWallet.methods
+        await contract.methods
           .setAllCandidatesAdded()
-          .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
-        await contractWallet.methods
+          .send({ from: window.ethereum.selectedAddress});
+        await contract.methods
           .setVotingEndTime()
-          .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
+          .send({ from: window.ethereum.selectedAddress});
         const allcandidates = await contractWallet.methods
           .allCandidatesadded()
           .call();

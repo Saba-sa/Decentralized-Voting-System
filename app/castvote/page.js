@@ -86,9 +86,9 @@ const Castvote = () => {
       }
 
       const temp = "0x".concat(hash);
-      await contractWallet.methods
+      await contract.methods
         .balletPaper(temp, cnic, idofcan)
-        .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
+        .send({ from: window.ethereum.selectedAddress });
 
       setSuccessMsg("Vote cast successfully!");
       setShowSuccessModal(true);

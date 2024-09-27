@@ -37,16 +37,13 @@ const Votestore = ({ children }) => {
   const getContractDetails = async () => {
     if (connectedWallet) {
       try {
-        // const web3Wallet = new Web3(window.ethereum);
-        // const web3InstanceALchemy = new Web3(
-        //   "https://eth-sepolia.g.alchemy.com/v2/CB6IJpmJWTUzOlLA-w5CTTVg6AYdE-dJ"
-        // );
-        const web3InstanceALchemy = new Web3("http://127.0.0.1:8545");
+        const web3InstanceALchemy = new Web3(
+"https://eth-sepolia.g.alchemy.com/v2/CB6IJpmJWTUzOlLA-w5CTTVg6AYdE-dJ"        );
         const web3Instance = new Web3(window.ethereum);
         const { abi, networks } = HandleVote;
-        const networkData = networks["local"];
+        // const networkData = networks["local"];
 
-        // const networkData = networks["11155111"];
+        const networkData = networks["11155111"];
         const contractAddress = networkData?.address;
         if (contractAddress) {
           const contractInstance = new web3Instance.eth.Contract(
