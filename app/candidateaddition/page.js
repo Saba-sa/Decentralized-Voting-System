@@ -15,11 +15,12 @@ export default function Page() {
     setisAllCandidatesAdded,
   } = useVotingIntegrationstore();
   const router = useRouter();
-
+console.log('is owner',isOwner,contract,contractWallet,isAllCandidatesAdded)
   useEffect(() => {
     const checkIfaddes = async () => {
       if (contract) {
-        const allcandidates = await contract.methods
+        console.log('inside contract use effect ')
+        const allcandidates = await contractWallet.methods
           .allCandidatesadded()
           .call();
         console.log("all canidate added", allcandidates);
@@ -57,7 +58,7 @@ export default function Page() {
         await contractWallet.methods
           .setVotingEndTime()
           .send({ from: window.ethereum.selectedAddress, gas: 3000000 });
-        const allcandidates = await contract.methods
+        const allcandidates = await contractWallet.methods
           .allCandidatesadded()
           .call();
         console.log("contract in candidate addition all setted", allcandidates);

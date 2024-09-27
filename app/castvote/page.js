@@ -107,10 +107,10 @@ const Castvote = () => {
 
   const getCandidateDetail = async () => {
     try {
-      const count = await contract.methods.candidateCount().call();
+      const count = await contractWallet.methods.candidateCount().call();
       const candidatesList = [];
       for (let i = 0; i < Number(count); i++) {
-        const detail = await contract.methods.getCandidate(i).call();
+        const detail = await contractWallet.methods.getCandidate(i).call();
         candidatesList.push({ id: i, name: detail.name });
       }
       setCandidateDetail(candidatesList);
