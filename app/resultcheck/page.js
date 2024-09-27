@@ -64,6 +64,7 @@ const Page = () => {
     };
     fetchVotingData();
   }, [contract]);
+  console.log(tempCandidate)
   const formatTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
