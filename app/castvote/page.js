@@ -132,6 +132,16 @@ const Castvote = () => {
 
   useEffect(() => {
     if (contract) {
+      const checkTime=async()=>{
+const targetTime = Number(
+            await contract.methods.getVotingEndTime().call()
+          );
+const currentTime = Math.floor(Date.now() / 1000);
+           if (currentTime >= targetTime) {
+      router.push("/resultcheck");
+           }
+      }
+      checkTime();
       getCandidateDetail();
     }
   
