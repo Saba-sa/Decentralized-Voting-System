@@ -32,7 +32,9 @@ const Castvote = () => {
     }
   };
   useEffect(() => {
+    setLoader(true)
     if (timeup) {
+      setLoader(false)
       router.push("/resultcheck");
     }
   }, [timeup]);
@@ -131,6 +133,7 @@ const Castvote = () => {
     if (contract) {
       getCandidateDetail();
     }
+  
   }, [contract]);
 
   const closeSuccessModal = () => setShowSuccessModal(false);
