@@ -101,19 +101,24 @@ const Page = () => {
         }
       });
 
-      tempcandidateNames.sort((a, b) => b.votesCount - a.votesCount);
-
-      const maxVotes = tempcandidateNames[0]?.votesCount;
-
-      const allEqual = tempcandidateNames.every(
-        (candidate) => candidate.votesCount === maxVotes
-      );
-
+ tempcandidateNames.sort((a, b) => b.votesCount - a.votesCount);
+    const maxVotes = tempcandidateNames[0]?.votesCount;
+  if (tempcandidateNames.length === 1) {
+      setWinner([tempcandidateNames[0]]);
+    } else {
+       
+ const allEqual = tempcandidateNames.every(
+      (candidate) => candidate.votesCount === maxVotes
+    );
       if (allEqual) {
-        setWinner([{ name: "All have same votes", votesCount: maxVotes }]);
-      } else {
-        setWinner([...tempcandidateNames]);
-      }
+        setWinner([{ name: "All have same votes", votesCount: "All got same votes" }]);
+      }  else {
+         const winners = tempcandidateNames.filter(
+          (candidate) => candidate.votesCount === maxVotes
+        );
+      
+      setWinner([{ name: "Two or more  have same votes", votesCount: "Two or more got same votes" }]); 
+    }}
     } catch (error) {
       console.error(`Error showing results: ${error.message}`);
     }
@@ -139,6 +144,7 @@ const Page = () => {
                 <div className="bg-green-100 text-green-700 p-4 rounded-lg shadow-md">
                   <h2 className="text-xl font-semibold">Winner</h2>
                   <p className="text-lg">{winner[0]?.name}</p>
+                  <p className="text-md">{winner[0]?.votesCount}</p>
                 </div>
               )}
               <div className="mb-6">
