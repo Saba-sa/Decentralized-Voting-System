@@ -38,7 +38,7 @@ contract HandleVote {
         _;
     }
 
-    function setAllCandidatesAdded() public {
+    function setAllCandidatesAdded() public onlyOwner {
         allCandidatesadded = true;
     }
 
