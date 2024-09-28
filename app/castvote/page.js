@@ -32,12 +32,13 @@ const Castvote = () => {
     }
   };
   useEffect(() => {
-    setLoader(true)
     if (timeup) {
-      setLoader(false)
       router.push("/resultcheck");
     }
   }, [timeup]);
+  
+
+
   const checkValidity = () => {
     const regestForCnic = /^\d{13}$/;
     if (regestForCnic.test(cnic) && randomno.length >= 1) {

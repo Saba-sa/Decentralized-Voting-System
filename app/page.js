@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Loader from "./loader/Page";
 
 const Page = () => {
-  const { isOwner, contract } = useVotingIntegrationstore();
+  const { isOwner, contract ,timeup} = useVotingIntegrationstore();
   const router = useRouter();
 
   useEffect(() => {
@@ -13,7 +13,12 @@ const Page = () => {
       if (isOwner) {
         router.push("/candidateaddition");
       } else {
-        router.push("/castvote");
+        if(timeup){
+          router.push("/resultcheck");
+
+        }else{
+          router.push("/castvote");
+        }
       }
     };
     InitializeContract();

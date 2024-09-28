@@ -43,6 +43,7 @@ const Page = () => {
                 const updatedTime = Math.floor(Date.now() / 1000);
                 const remainingTime = (targetTime - updatedTime) * 1000;
                 if (remainingTime <= 0) {
+                  
                   clearInterval(interval);
                   setIsTimerActive(false);
                   setTimeup(true);
@@ -113,9 +114,6 @@ const Page = () => {
       if (allEqual) {
         setWinner([{ name: "All have same votes", votesCount: "All got same votes" }]);
       }  else {
-         const winners = tempcandidateNames.filter(
-          (candidate) => candidate.votesCount === maxVotes
-        );
       
       setWinner([{ name: "Two or more  have same votes", votesCount: "Two or more got same votes" }]); 
     }}

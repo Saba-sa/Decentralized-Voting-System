@@ -41,6 +41,7 @@ contract HandleVote {
     function setAllCandidatesAdded() public {
         allCandidatesadded = true;
     }
+   
 
     function setVotingEndTime() public onlyOwner {
         votingEndTime = block.timestamp + (3 * 60 * 60);
