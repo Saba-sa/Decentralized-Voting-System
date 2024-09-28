@@ -131,6 +131,7 @@ const Castvote = () => {
   }, [cnic, randomno]);
 
   useEffect(() => {
+    setLoader(true)
     if (contract) {
       const checkTime=async()=>{
 const targetTime = Number(
@@ -139,10 +140,12 @@ const targetTime = Number(
 const currentTime = Math.floor(Date.now() / 1000);
            if (currentTime >= targetTime) {
       router.push("/resultcheck");
-           }
+      setLoader(false)
+           }else{
+             getCandidateDetail();
+          }
       }
       checkTime();
-      getCandidateDetail();
     }
   
   }, [contract]);
